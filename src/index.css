@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #8f7dc6;
+  --color-secondary: #f5f7f9;
+  --color-tertiary: #163200;
+}
+
+body {
+  @apply bg-primary/10 font-sans leading-relaxed font-normal m-0;
+}
+
+button {
+  cursor: pointer;
+}
+
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.testimonial-marquee {
+  animation: marquee-scroll 30s linear infinite;
+}

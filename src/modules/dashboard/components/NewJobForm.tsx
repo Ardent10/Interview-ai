@@ -1,10 +1,11 @@
-// src/modules/dashboard/recruiter/sections/NewJobForm.tsx
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { newJobSchema, JobFormValues } from "../../../../utils/validations";
-import { FormInput } from "../../../common/form/Input";
-import ChipMultiSelect from "../../../common/form/ChipSelector";
-import Textarea from "../../../common/form/Textarea";
+import { newJobSchema, JobFormValues } from "../../../utils/validations";
+import { FormInput } from "../../common/form/Input";
+import ChipMultiSelect from "../../common/form/ChipSelector";
+import Textarea from "../../common/form/Textarea";
+import { useNavigate } from "react-router-dom";
+import { useJobs } from "../hooks";
 
 const skillOptions = [
   "React",
@@ -18,6 +19,8 @@ const skillOptions = [
 ];
 
 export default function NewJobForm() {
+  const { postJob, loading } = useJobs();
+  const navigate = useNavigate();
   const methods = useForm<JobFormValues>({
     resolver: zodResolver(newJobSchema),
     defaultValues: {
@@ -29,10 +32,15 @@ export default function NewJobForm() {
     },
   });
 
-  const { handleSubmit } = methods;
+  const { handleSubmit, reset } = methods;
 
-  const onSubmit = (data: JobFormValues) => {
-    console.log("Submitted Job:", data);
+  const onSubmit = async (data: JobFormValues) => {
+    const result = await postJob(data);
+    console.log("Result", result);
+    if (result) {
+      navigate("/dashboard/jobs");
+      reset();
+    }
   };
 
   return (

@@ -3,7 +3,7 @@ import { BotMessageSquare, FileCheck } from "lucide-react";
 
 export default function HeroSection() {
   return (
-    <SectionWrapper className="bg-primary p-0 bg-[length:100%] bg-center min-h-screen bg-no-repeat bg-[url(assets/hero/hero-bg.jpg)]">
+    <SectionWrapper className="bg-primary p-0 bg-[length:100%] bg-center min-h-screen bg-no-repeat bg-[url(/assets/hero/hero-bg.jpg)]">
       <div className="flex flex-col justify-end items-center text-center px-4  h-full">
         <div className="flex flex-col items-center">
           <h1 className="text-[5rem] md:text-[8rem] lg:text-[10rem] leading-none font-bold text-white tracking-tight">

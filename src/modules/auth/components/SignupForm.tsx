@@ -8,8 +8,10 @@ import PrimaryButton from "../../common/Button";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import RoleSelector from "./RoleSelector";
+import { useAuth } from "../hooks";
 
 export default function SignupForm() {
+  const { signup, error, loading } = useAuth();
   const [selectedRole, setSelectedRole] = useState<"job-seeker" | "recruiter">(
     "job-seeker"
   );
@@ -25,18 +27,30 @@ export default function SignupForm() {
     methods.setValue("role", selectedRole);
   }, [selectedRole, methods]);
 
-  const onSubmit = methods.handleSubmit((data) => {
-    console.log("Signup data submitted:", data);
+  const onSubmit = methods.handleSubmit(async (data) => {
+    const { email, password, firstName, lastName, role } = data;
+    const result = await signup({
+      email,
+      password,
+      firstName,
+      lastName,
+      role: selectedRole,
+    });
+
+    if (!result.error) {
+      // Redirect to dashboard or show success
+      console.log("Signed up successfully");
+    }
   });
 
   return (
-    <div className="p-12">
+    <div className="p-12 h-screen bg-white">
       <div className="flex items-center space-x-2">
         <Logo height={50} width={50} />
         <h1 className="text-3xl font-bold text-primary">Interview AI</h1>
       </div>
 
-      <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 bg-white">
+      <div className=" flex flex-col items-center justify-center px-4 py-8 ">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
             Create Your Account

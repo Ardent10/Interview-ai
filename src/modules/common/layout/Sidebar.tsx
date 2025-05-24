@@ -8,6 +8,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import Tooltip from "../Tooltip";
 
 export default function Sidebar() {
   const [expanded, setExpanded] = useState(false);
@@ -47,7 +48,6 @@ export default function Sidebar() {
     },
   ];
 
-  // Determine active key based on pathname or search
   const isActive = (match: string) => {
     return (
       location.pathname.includes(match) ||
@@ -70,20 +70,30 @@ export default function Sidebar() {
         </button>
       </div>
 
-      {menuItems.map((item) => (
-        <button
-          key={item.path}
-          onClick={() => navigate(item.path)}
-          className={`flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition ${
-            isActive(item.match)
-              ? "bg-primary text-white"
-              : "text-tertiary hover:bg-primary/10"
-          }`}
-        >
-          {item.icon}
-          {expanded && <span>{item.label}</span>}
-        </button>
-      ))}
+      {menuItems.map((item) => {
+        const button = (
+          <button
+            key={item.path}
+            onClick={() => navigate(item.path)}
+            className={`flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition ${
+              isActive(item.match)
+                ? "bg-primary text-white"
+                : "text-tertiary hover:bg-primary/10"
+            }`}
+          >
+            {item.icon}
+            {expanded && <span>{item.label}</span>}
+          </button>
+        );
+
+        return !expanded ? (
+          <Tooltip key={item.path} text={item.label} position="right">
+            {button}
+          </Tooltip>
+        ) : (
+          button
+        );
+      })}
     </aside>
   );
 }

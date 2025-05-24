@@ -1,10 +1,10 @@
 import Navbar from "../../../common/layout/Navbar";
-import NewJobForm from "../components/NewJobForm";
+import NewJobForm from "../../components/NewJobForm";
 import Sidebar from "../../../common/layout/Sidebar";
 
 export default function RecruiterDashboard() {
   return (
-    <div className="p-8 min-h-screen bg-background">
+    <div className="p-6 min-h-screen bg-background">
       <Navbar />
 
       <div className="flex">

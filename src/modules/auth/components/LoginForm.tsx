@@ -6,11 +6,14 @@ import { FormInput } from "../../common/form/Input";
 import Logo from "../../common/layout/Logo";
 import { LogIn } from "lucide-react";
 import PrimaryButton from "../../common/Button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import RoleSelector from "./RoleSelector";
+import { useAuth } from "../hooks";
 
 const LoginForm: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<string>("job-seeker");
+  const { login, error, loading } = useAuth();
+  const navigate = useNavigate();
 
   const methods = useForm<LoginFormInputs & { role: string }>({
     resolver: zodResolver(loginSchema),
@@ -19,12 +22,17 @@ const LoginForm: React.FC = () => {
     },
   });
 
-  const onSubmit = methods.handleSubmit((data) => {
+  const onSubmit = methods.handleSubmit(async (data) => {
     const submitData = {
       ...data,
       role: selectedRole,
     };
-    console.log("Login data submitted:", submitData);
+
+    const result = await login(submitData);
+
+    if (!result.error) {
+      navigate("/dashboard/jobs");
+    }
   });
 
   return (
@@ -61,10 +69,15 @@ const LoginForm: React.FC = () => {
               required
             />
 
-            <PrimaryButton type="submit" icon={<LogIn />}>
-              Login as{" "}
-              {selectedRole === "job-seeker" ? "Job Seeker" : "Recruiter"}
+            <PrimaryButton type="submit" icon={<LogIn />} disabled={loading}>
+              {loading
+                ? "Logging in..."
+                : `Login as ${
+                    selectedRole === "job-seeker" ? "Job Seeker" : "Recruiter"
+                  }`}
             </PrimaryButton>
+
+            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
           </form>
         </FormProvider>
 

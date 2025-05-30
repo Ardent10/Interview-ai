@@ -9,28 +9,34 @@ type Action = {
 };
 
 const globalReducers = (state: State, action: Action) => {
-  const { type } = action;
-  switch (type) {
-    case "SET_USER_PROFILE": {
-      return {
-        ...state,
-        userProfile: action.payload,
-      };
-    }
-      case "SET_IS_LOADING": {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    }
+  const { type, payload } = action;
 
-    case 'LOGOUT' : {
+  switch (type) {
+    case "SET_USER_PROFILE":
+      return { ...state, userProfile: payload };
+
+    case "SET_IS_LOADING":
+      return { ...state, ...payload };
+
+    case "UPDATE_RESUME_MODAL":
+      return {
+        ...state,
+        resumeModal: { ...state.resumeModal, ...payload },
+      };
+
+    case "RESET_RESUME_MODAL":
+      return {
+        ...state,
+        resumeModal: initialState.resumeModal,
+      };
+
+    case "LOGOUT":
       return initialState;
-    }
 
     default:
       return state;
   }
 };
+
 
 export { globalReducers };

@@ -4,12 +4,14 @@ import { useState } from "react";
 import Logo from "./Logo";
 import Dropdown from "../Dropdown";
 import { useAppState } from "../../../store";
+import { useAuth } from "../../auth/hooks";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const [state, dispatch] = useAppState();
+  const { logoutUser } = useAuth();
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-
+  console.log("USE APP STATE-> ", state);
   const isLoggedIn = !!state?.userProfile;
 
   const serviceItems = [
@@ -27,15 +29,13 @@ export default function Navbar() {
     { label: "Candidate Analytics" },
   ];
 
-  const handleLogout = () => {
-    dispatch({ type: "LOGOUT", payload: {} });
-    navigate("/");
+  const handleLogout = async () => {
+    await logoutUser();
   };
 
   return (
     <nav className="w-full px-4 py-4 bg-secondary rounded-3xl shadow-sm mb-4">
       <div className="flex items-center justify-between">
-
         <div
           className="flex items-center gap-2 cursor-pointer"
           onClick={() => navigate("/")}
@@ -43,7 +43,6 @@ export default function Navbar() {
           <Logo height={30} width={40} />
           <h1 className="font-bold text-xl text-primary">Interview AI</h1>
         </div>
-
 
         <div className="hidden md:flex items-center gap-6 text-tertiary font-medium">
           <button
@@ -63,20 +62,17 @@ export default function Navbar() {
               </button>
               <button
                 className="hover:text-primary transition-colors"
-                onClick={() => navigate("/dashboard")}
+                onClick={() => navigate(`/dashboard/${state.userProfile.role}`)}
               >
-                Dashboard
+                Create
               </button>
             </>
           )}
-
         </div>
-
 
         <div className="block sm:hidden">
           <Dropdown label="Services" items={serviceItems} />
         </div>
-
 
         <div className="relative ml-4">
           {isLoggedIn ? (

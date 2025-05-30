@@ -6,53 +6,65 @@ import {
   BarChart2,
   ChevronLeft,
   ChevronRight,
+  ScrollText,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Tooltip from "../Tooltip";
+import { useAppState } from "../../../store";
 
 export default function Sidebar() {
   const [expanded, setExpanded] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const [state] = useAppState();
 
-  const menuItems = [
+  const role = state.userProfile?.role;
+
+  const allMenuItems = [
     {
       label: "All Jobs",
-      icon: <FilePlus size={20} />,
+      icon: <ScrollText size={20} />,
       path: "/dashboard/jobs",
-      match: "jobs",
+      match: "/jobs",
+      roles: ["recruiter", "job-seeker"],
     },
     {
       label: "Post Job",
       icon: <FilePlus size={20} />,
-      path: "/dashboard?role=recruiter",
-      match: "recruiter",
+      path: "/dashboard/jobs/new",
+      match: "/jobs/new",
+      roles: ["recruiter"],
     },
     {
       label: "Applicants",
       icon: <Users size={20} />,
-      path: "/dashboard?role=jobseeker",
-      match: "jobseeker",
+      path: "/dashboard/jobseeker",
+      match: "/jobseeker",
+      roles: ["recruiter"],
     },
     {
       label: "AI Attempts",
       icon: <FileText size={20} />,
       path: "/dashboard/attempts",
-      match: "attempts",
+      match: "/attempts",
+      roles: ["job-seeker"],
     },
     {
       label: "Analytics",
       icon: <BarChart2 size={20} />,
       path: "/dashboard/analytics",
-      match: "analytics",
+      match: "/analytics",
+      roles: ["recruiter"],
     },
   ];
 
+  const filteredMenuItems = allMenuItems.filter((item) =>
+    item.roles.includes(role)
+  );
+
   const isActive = (match: string) => {
-    return (
-      location.pathname.includes(match) ||
-      location.search.includes(`role=${match}`)
-    );
+    const pathname = location.pathname;
+    return pathname.startsWith(match);
   };
 
   return (
@@ -70,13 +82,13 @@ export default function Sidebar() {
         </button>
       </div>
 
-      {menuItems.map((item) => {
+      {filteredMenuItems.map((item) => {
         const button = (
           <button
             key={item.path}
             onClick={() => navigate(item.path)}
             className={`flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition ${
-              isActive(item.match)
+              isActive(item.path)
                 ? "bg-primary text-white"
                 : "text-tertiary hover:bg-primary/10"
             }`}

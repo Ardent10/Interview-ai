@@ -2,6 +2,9 @@
 import { useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { useAppState } from "../../../store";
 
 interface SignupPayload {
   email: string;
@@ -19,9 +22,50 @@ interface LoginPayload {
 
 export function useAuth() {
   const [loading, setLoading] = useState(false);
+  const [_, dispatch] = useAppState();
+  const naviagate = useNavigate();
   const [error, setError] = useState<string | null>(null);
 
-  const login = async ({ email, password, role }: LoginPayload) => {
+  async function fetchUserProfile() {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    if (userError || !user) throw new Error("No user");
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  function userProfile(enabled = true) {
+    return useQuery({
+      queryKey: ["userProfile"],
+      queryFn: fetchUserProfile,
+      enabled,
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 10, // 10 minutes
+    });
+  }
+
+  async function logoutUser() {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Supabase logout error:", error.message);
+        throw error;
+      }
+
+      dispatch({ type: "LOGOUT", payload: {} });
+    } catch (error) {}
+  }
+
+  async function login({ email, password, role }: LoginPayload) {
     setLoading(true);
     setError(null);
 
@@ -44,15 +88,15 @@ export function useAuth() {
     }
 
     return { data, error: null };
-  };
+  }
 
-  const signup = async ({
+  async function signup({
     email,
     password,
     role,
     firstName,
     lastName,
-  }: SignupPayload) => {
+  }: SignupPayload) {
     setLoading(true);
     setError(null);
 
@@ -89,21 +133,26 @@ export function useAuth() {
     }
 
     toast.success("Signup successful, please check your email to confirm.");
+    naviagate("/dashboard/jobs");
 
     setLoading(false);
     return { data, error: null };
-  };
+  }
 
-  const logout = async () => {
-    await supabase.auth.signOut();
-    toast.success("Logged out");
-    localStorage.removeItem("user-role");
-  };
 
-  const getCurrentUser = async () => {
+  async function getCurrentUser() {
     const { data } = await supabase.auth.getUser();
     return data.user;
-  };
+  }
 
-  return { login, signup, logout, getCurrentUser, loading, error };
+  return {
+    fetchUserProfile,
+    userProfile,
+    logoutUser,
+    login,
+    signup,
+    getCurrentUser,
+    loading,
+    error,
+  };
 }

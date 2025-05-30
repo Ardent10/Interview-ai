@@ -1,21 +1,23 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUserProfile } from "./hooks";
 import { useAppState } from "../../../store";
 import { supabase } from "../../../lib/supabaseClient";
+import { useAuth } from "../../auth/hooks";
 
 const AppLoader = () => {
-  const { data: profile, isSuccess } = useUserProfile();
+  const { userProfile } = useAuth();
+  const { data: profile, isSuccess } = userProfile();
   const [_, dispatch] = useAppState();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (isSuccess && profile) {
       dispatch({ type: "SET_USER_PROFILE", payload: profile });
-      const isAtRoot = location.pathname === "/login" || location.pathname === "/signup";
+      const isAtRoot =
+        location.pathname === "/login" || location.pathname === "/signup";
 
       if (isAtRoot) {
-        navigate("/dashboard/jobs", { replace: true });
+        navigate("/dashboard", { replace: true });
       }
     }
   }, [isSuccess, profile, dispatch, navigate]);

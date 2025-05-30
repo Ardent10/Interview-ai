@@ -29,18 +29,13 @@ export default function SignupForm() {
 
   const onSubmit = methods.handleSubmit(async (data) => {
     const { email, password, firstName, lastName, role } = data;
-    const result = await signup({
+    await signup({
       email,
       password,
       firstName,
       lastName,
       role: selectedRole,
     });
-
-    if (!result.error) {
-      // Redirect to dashboard or show success
-      console.log("Signed up successfully");
-    }
   });
 
   return (
